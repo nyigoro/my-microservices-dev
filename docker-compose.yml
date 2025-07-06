@@ -1,64 +1,53 @@
-version: '3.8' # Specify Docker Compose file format version
+# version: '3.8' # Docker Compose file format
 
 services:
   frontend:
-    build: ./frontend # Build the image from the Dockerfile in the frontend/ directory
+    build: ./frontend # Build image from frontend Dockerfile
     container_name: frontend_app
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}" # Map host port to container port (3000:3000)
-    volumes:
-      # Mount local frontend code for live updates during development
-      - ./frontend:/usr/share/nginx/html
+      - "${FRONTEND_PORT}:80" # Host:Container (React served via Nginx)
     depends_on:
-      - backend # Ensure backend starts before frontend
+      - backend
     environment:
-      # The API URL for the frontend to connect to the backend
-      # This should match the internal Docker network name and port
+      # Used in the React build (REACT_APP_* are injected at build time)
       REACT_APP_API_URL: http://backend:${BACKEND_PORT}/api
 
   backend:
-    build: ./backend # Build the image from the Dockerfile in the backend/ directory
+    build: ./backend # Build image from backend Dockerfile
     container_name: backend_api
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}" # Map host port to container port (8080:8080)
+      - "${BACKEND_PORT}:${BACKEND_PORT}" # Expose backend API
     volumes:
-      # Mount local backend code for live updates
-      - ./backend:/usr/src/app
-      # This specifically tells Docker NOT to mount node_modules from the host
-      # This is vital when npm install runs inside the container
-      - /usr/src/app/node_modules
+      - ./backend:/usr/src/app # Mount backend code for live updates
+      - /usr/src/app/node_modules # Prevent host node_modules from overwriting container's
     depends_on:
-      - database # Ensure database starts before backend
+      - database
     environment:
-      # Pass database connection details from .env to the backend container
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      DB_HOST: database # This refers to the service name 'database' in docker-compose.yml
+      DB_HOST: database
       DB_PORT: ${DB_PORT}
-      PORT: ${BACKEND_PORT} # Ensure backend listens on the correct port
+      PORT: ${BACKEND_PORT}
 
   database:
-    image: postgres:13-alpine # Use a specific version of the official PostgreSQL image
+    image: postgres:13-alpine
     container_name: postgres_db
     ports:
-      - "${DB_PORT}:${DB_PORT}" # Optional: Expose DB port to host for local tools
+      - "${DB_PORT}:${DB_PORT}" # Optional: expose to host
     volumes:
-      # Persist database data to a named volume, so data isn't lost on container restart/removal
       - db_data:/var/lib/postgresql/data
-      # Optional: Mount an init script for initial table creation/data seeding
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql # UNCOMMENT THIS LINE TO RUN INIT SCRIPT
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro # Optional init script
     environment:
-      # PostgreSQL specific environment variables for initial setup
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    healthcheck: # Healthcheck for the database to ensure it's ready
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-volumes: # Define named volumes for persistent data
+volumes:
   db_data:
-    driver: local # Use local driver for storing data on the host machine
+    driver: local
