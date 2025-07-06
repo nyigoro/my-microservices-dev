@@ -2,10 +2,10 @@
 
 services:
   frontend:
-    build: ./frontend # Build image from frontend Dockerfile
-    container_name: frontend_app
-    ports:
-      - "${FRONTEND_PORT}:80" # Host:Container (React served via Nginx)
+  build: ./frontend
+  container_name: frontend_app
+  ports:
+    - "3000:80"
     depends_on:
       - backend
     environment:
