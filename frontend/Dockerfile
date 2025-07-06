@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build # This creates the 'build' folder with static assets
 
 # Stage 2: Serve the built React application using Nginx
-FROM nginx:alpine # Use Nginx for serving static files
+FROM nginx:alpine
 
 # Copy ONLY the built static assets from the builder stage into Nginx's web root
 COPY --from=builder /app/build /usr/share/nginx/html
