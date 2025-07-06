@@ -1,34 +1,52 @@
-# --- Build Stage ---
+# --- Stage 1: Builder Stage ---
+# Use a Node.js image to build/install dependencies.
+# We name this stage 'builder' so we can reference it later.
 FROM node:18-alpine AS builder
 
+# Set the working directory inside this stage's container
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package.json and package-lock.json first.
+# This leverages Docker's layer caching: if these files don't change,
+# the npm install step won't be re-executed on subsequent builds, speeding them up.
+COPY package.json ./
+COPY package-lock.json ./ # Include package-lock.json for deterministic builds
 
+# Install only production dependencies.
+# This avoids including dev dependencies in the final image.
 RUN npm install --omit=dev
 
-# --- Production Stage ---
+# Copy the rest of your application source code
+COPY . .
+
+# --- Stage 2: Production Stage ---
+# Start a fresh, lean Node.js image for the final production environment.
 FROM node:18-alpine
 
-# Set environment variables (these can be overridden by Docker Compose)
+# Set the working directory for the application in the final image
+WORKDIR /usr/src/app
+
+# Create a non-root user and group for enhanced security.
+# This prevents the application from running as 'root' inside the container.
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+# Copy only the necessary artifacts from the 'builder' stage:
+# 1. The installed node_modules
+COPY --from=builder /app/node_modules ./node_modules
+# 2. The application's source code (app.js, etc.)
+COPY --from=builder /app/app.js ./
+# (If you had other config files like .env templates or static assets needed at runtime, you'd copy them here too)
+
+# Set environment variables for the production environment
+# These can be overridden by Docker Compose environment variables
 ENV NODE_ENV=production \
     PORT=8080
 
-# Create a non-root user and group for security
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-
-WORKDIR /usr/src/app
-
-# Copy only necessary files from the build stage (node_modules)
-COPY --from=builder /app/node_modules ./node_modules
-# Copy the application code (excluding files in .dockerignore)
-COPY . .
-
-# Set the user to the non-root user
+# Switch to the non-root user for running the application
 USER appuser
 
-# Expose the application port
+# Expose the port your application will listen on
 EXPOSE ${PORT}
 
-# Command to run the application
+# Define the command to run your application when the container starts
 CMD ["node", "app.js"]
