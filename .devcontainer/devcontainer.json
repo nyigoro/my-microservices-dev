@@ -1,0 +1,11 @@
+// .devcontainer/devcontainer.json
+{
+  "name": "My Dev Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/app",
+  "extensions": ["ms-azuretools.vscode-docker", "dbaeumer.vscode-eslint"],
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  }
+}
