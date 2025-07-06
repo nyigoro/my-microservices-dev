@@ -4,7 +4,8 @@
   "description": "A simple Node.js Express API for the Dockerized Dev Environment",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+  "dev": "nodemon app.js",
+  "start": "node app.js"
   },
   "keywords": [],
   "author": "",
