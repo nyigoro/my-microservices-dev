@@ -1,11 +1,21 @@
 // .devcontainer/devcontainer.json
 {
   "name": "My Dev Environment",
-  "dockerComposeFile": "docker-compose.yml",
+  "dockerComposeFile": "../docker-compose.yml", // Adjusted path if your .devcontainer is directly in the root
   "service": "backend",
-  "workspaceFolder": "/app",
-  "extensions": ["ms-azuretools.vscode-docker", "dbaeumer.vscode-eslint"],
-  "settings": {
-    "terminal.integrated.defaultProfile.linux": "bash"
+  "workspaceFolder": "/usr/src/app", // Adjusted workspace folder to match backend Dockerfile WORKDIR
+
+  // --- START of Corrected Section ---
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "dbaeumer.vscode-eslint"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
   }
+  // --- END of Corrected Section ---
 }
