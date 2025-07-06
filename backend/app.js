@@ -38,7 +38,7 @@ pool.connect((err, client, done) => {
 
 // API Routes
 app.get('/', (req, res) => {
-  res.send('Backend API is running!');
+  res.send('🎉 Backend is hot-reloading!');
 });
 
 app.get('/api/users', async (req, res) => {
