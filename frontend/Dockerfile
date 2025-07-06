@@ -1,11 +1,11 @@
-# Use a lightweight Nginx image
-FROM nginx:alpine
+FROM node:18-alpine as builder
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY . .
+RUN npm run build # Creates 'build' directory
 
-# Copy our static files to the Nginx default directory
-COPY . /usr/share/nginx/html
-
-# Expose port 80 (Nginx default)
+FROM nginx:alpine # Use Nginx for serving static files
+COPY --from=builder /app/build /usr/share/nginx/html # ONLY copy the built static assets
 EXPOSE 80
-
-# Command to run Nginx (default command of nginx:alpine image)
 CMD ["nginx", "-g", "daemon off;"]
