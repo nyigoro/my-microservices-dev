@@ -25,6 +25,25 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # --- 🔍 Run Backend Tests ---
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ./backend
+
+      - name: Run backend tests
+        run: npm test
+        working-directory: ./backend
+
+      # --- 🧼 Run Frontend Lint ---
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Run frontend lint
+        run: npm run lint
+        working-directory: ./frontend
+
+      # --- 🐳 Build & Push Docker Images ---
       - name: Build & Push Frontend Image
         uses: docker/build-push-action@v5
         with:
@@ -39,6 +58,7 @@ jobs:
           push: true
           tags: ${{ env.BACKEND_IMAGE }}:latest
 
+      # --- 🚀 Trigger Deploy to Render ---
       - name: Trigger Render Deploy (Frontend)
         run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}
 
