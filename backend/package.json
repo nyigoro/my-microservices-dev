@@ -5,14 +5,15 @@
   "main": "app.js",
   "scripts": {
   "dev": "nodemon app.js",
-  "start": "node app.js"
+  "start": "node app.js",
+  "test": "node test/basic.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "pg": "^8.12.0"
+    "dotenv": "^17.0.1",
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
   }
 }
