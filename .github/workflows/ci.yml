@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      FRONTEND_IMAGE: your-dockerhub-username/frontend
-      BACKEND_IMAGE: your-dockerhub-username/backend
+      FRONTEND_IMAGE: nyigoro/frontend
+      BACKEND_IMAGE: nyigoro/backend
 
     steps:
     - name: Checkout code
