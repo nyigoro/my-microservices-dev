@@ -41,6 +41,11 @@ app.get('/', (req, res) => {
   res.send('🎉 Backend is hot-reloading!');
 });
 
+app.get('/api', (req, res) => {
+  res.send('Welcome to the API! Available routes: /api/users');
+});
+
+
 app.get('/api/users', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM users ORDER BY id ASC');
