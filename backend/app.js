@@ -71,5 +71,5 @@ app.post('/api/users', async (req, res) => {
 
 // Start the server
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Backend API listening on http://0.0.0.0:${port}`);
+  console.log(`🎉 Backend API listening on http://0.0.0.0:${port}`);
 });
